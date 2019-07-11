@@ -2,7 +2,7 @@
 
 NAME = RTv1
 
-FLAGS = -Wall -Wextra -Werror #-fsanitize=address -g
+FLAGS = -Wall -Wextra #-Werror #-fsanitize=address -g
 
 SRC_DIR = ./src/
 
@@ -42,13 +42,13 @@ CLEAN_NAME	= "Cleaned $(NAME) Binary"
 all: obj $(NAME)
 
 $(NAME): $(OBJ)
-	gcc $(FLAGS) $^ -lSDL2 -lSDL2main -o $@
+	@gcc $(FLAGS) $^ -lSDL2 -lSDL2main -o $@
 	@echo "$(COM_COLOR)$(COM_STRING)$(NO_COLOR)"
 
 #OBJECTS
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	gcc $(FLAGS) $(INC) -c $< -o $@
+	@gcc $(FLAGS) $(INC) -c $< -o $@
 
 obj:
 	@mkdir $(OBJ_DIR)
