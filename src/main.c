@@ -1,8 +1,9 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#include "rtv1.h"
+#include "rtv1_types.h"
+#include "vector3.h"
 
 void raytracer(Uint32 *pixel_buffer)
 {
@@ -56,99 +57,83 @@ void draw_circle(int radius, int x0, int y0, Uint32 *pixel_buffer)
     }
 }
 
-int main()
+void rt_cleanup(t_rt *rt)
 {
-	SDL_Window* window = NULL;
-	SDL_Renderer *renderer = NULL;
-   	char quit = 0;
-    SDL_Event event;
+	free(rt->pixels);
+    SDL_DestroyRenderer(rt->renderer);
+	SDL_DestroyWindow(rt->window);
+}
 
+int init_sdl(t_rt *rt)
+{
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError());
-		return 1;
+		return 0;
 	}
-	window = SDL_CreateWindow(
-				"RTv1",
-				SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-				SCREEN_WIDTH, SCREEN_HEIGHT,
-				SDL_WINDOW_SHOWN
+	rt->window = SDL_CreateWindow(
+					"RTv1",
+					SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+					SCREEN_WIDTH, SCREEN_HEIGHT,
+					SDL_WINDOW_SHOWN
 				);
-	if (window == NULL) {
-		fprintf(stderr, "could not create window: %s\n", SDL_GetError());
-		return 1;
+	if (!rt->window)
+		return 0;
+	rt->renderer = SDL_CreateRenderer(rt->window, -1, SDL_RENDERER_ACCELERATED);
+	rt->pixels = malloc(sizeof(unsigned int) * SCREEN_HEIGHT * SCREEN_WIDTH);
+	memset(rt->pixels, 0, sizeof(unsigned int) * SCREEN_HEIGHT * SCREEN_WIDTH);
+	return 1;
+}
+
+int get_events(SDL_Event *event)
+{
+	SDL_WaitEvent(event);
+	switch (event->type)
+	{
+		case SDL_KEYDOWN:
+			switch (event->key.keysym.sym)
+			{
+				case SDLK_q:
+					return 1;
+					break;
+			}
+			break;
+		case SDL_QUIT:
+			return 1;
+			break;
 	}
+	return 0;
+}
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-	SDL_Texture *texture = SDL_CreateTexture(
-		renderer,
-		SDL_PIXELFORMAT_ABGR8888,
-		SDL_TEXTUREACCESS_STATIC,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT
-	);
-
-	Uint32 *pixels = malloc(sizeof(Uint32) * SCREEN_HEIGHT * SCREEN_WIDTH);
-
-	Uint32 color = 0x4287f5;
-
-	memset(pixels, color, sizeof(Uint32) * SCREEN_HEIGHT * SCREEN_WIDTH);
-	draw_circle(30, 300, 200, pixels);
-
-	raytracer(pixels);
-
-	char left_mouse_down = 0;
+void	render_window(t_rt *rt)
+{
+	t_rgba color;
 
 
+	for (int y = 0; y < SCREEN_HEIGHT; y++)
+		for (int x = 0; x < SCREEN_WIDTH; x++)
+		{
+			color = uint_to_rgba(rt->pixels[y * SCREEN_HEIGHT + x]);
+			// printf("color: %u, r: %u, g: %u, b: %u, a: %u\n", rt->pixels[y * SCREEN_HEIGHT + x], color.r, color.g, color.b, color.a);
+			SDL_SetRenderDrawColor(rt->renderer,
+				color.r, color.g, color.b, color.a);
+			SDL_RenderDrawPoint(rt->renderer, x, y);
+		}
+	SDL_RenderPresent(rt->renderer);
+}
+
+int main()
+{
+	t_rt	rt;
+    SDL_Event		event;
+	char quit = 0;
+
+	init_sdl(&rt);
+	render_window(&rt);
     while (!quit)
     {
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		for (int i = 0; i < SCREEN_HEIGHT; ++i)
-			SDL_RenderDrawPoint(renderer, i, i);
-
-        SDL_WaitEvent(&event);
-        switch (event.type)
-        {
-			case SDL_MOUSEBUTTONUP:
-				if (event.button.button == SDL_BUTTON_LEFT)
-					left_mouse_down = 0;
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == SDL_BUTTON_LEFT)
-					left_mouse_down = 1;
-				break;
-			case SDL_MOUSEMOTION:
-				if (left_mouse_down)
-				{
-					int mouse_x = event.motion.x;
-					int mouse_y = event.motion.y;
-    				SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-					SDL_RenderDrawPoint(renderer, mouse_x, mouse_y);
-				}
-				break;
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_c:
-						// SDL_RenderClear(renderer);
-						break;
-				}
-				break;
-
-            case SDL_QUIT:
-                quit = 1;
-                break;
-        }
-
-        SDL_RenderPresent(renderer);
+		quit = get_events(&event);
     }
-
-	free(pixels);
-	SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	rt_cleanup(&rt);
 	SDL_Quit();
 	return 0;
 }

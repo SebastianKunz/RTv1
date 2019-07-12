@@ -6,7 +6,7 @@ FLAGS = -Wall -Wextra #-Werror #-fsanitize=address -g
 
 SRC_DIR = ./src/
 
-SRC = main.c
+SRC = main.c rgba.c
 
 ###################################### OBJECTS #################################
 
@@ -19,6 +19,14 @@ OBJ = $(addprefix $(OBJ_DIR),$(SRC:.c=.o))
 SDL_PATH = ~/homebrew/Cellar/sdl2/2.0.9_1/lib
 
 SDL_LIB = -L $(SDL_PATH)/ -l SDL2
+
+LIB_DIR = ./libraries
+
+VECTOR_PATH = $(LIB_DIR)/vector3
+
+VECTOR_LIB = -L $(VECTOR_PATH) -l vector3
+
+VECTOR_INC = -I $(VECTOR_PATH)/includes
 
 ###################################### HEADERS #################################
 
@@ -39,21 +47,22 @@ CLEAN_NAME	= "Cleaned $(NAME) Binary"
 
 ######################################## RULES #################################
 
-all: obj $(NAME)
+all: lib obj $(NAME)
 
 $(NAME): $(OBJ)
-	@gcc $(FLAGS) $^ -lSDL2 -lSDL2main -o $@
+	@gcc $(FLAGS) $^ -lSDL2 -lSDL2main $(VECTOR_LIB) -o $@
 	@echo "$(COM_COLOR)$(COM_STRING)$(NO_COLOR)"
 
 #OBJECTS
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	@gcc $(FLAGS) $(INC) -c $< -o $@
+	@gcc $(FLAGS) $(INC) $(VECTOR_INC) -c $< -o $@
 
 obj:
 	@mkdir $(OBJ_DIR)
 
-#RTV
+lib:
+	@make -C $(VECTOR_PATH) all
 
 clean:
 	@/bin/rm -rf $(OBJ_DIR)
