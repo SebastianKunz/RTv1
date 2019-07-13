@@ -6,7 +6,7 @@ FLAGS = -Wall -Wextra #-Werror #-fsanitize=address -g
 
 SRC_DIR = ./src/
 
-SRC = main.c rgba.c
+SRC = main.c rgba.c ray.c sphere.c
 
 ###################################### OBJECTS #################################
 
@@ -50,13 +50,13 @@ CLEAN_NAME	= "Cleaned $(NAME) Binary"
 all: lib obj $(NAME)
 
 $(NAME): $(OBJ)
-	@gcc $(FLAGS) $^ -lSDL2 -lSDL2main $(VECTOR_LIB) -o $@
+	@gcc $(FLAGS) $^ -lSDL2 -lSDL2main -lm $(VECTOR_LIB) -o $@
 	@echo "$(COM_COLOR)$(COM_STRING)$(NO_COLOR)"
 
 #OBJECTS
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	@gcc $(FLAGS) $(INC) $(VECTOR_INC) -c $< -o $@
+	@gcc $(FLAGS) $(INC) $(VECTOR_INC) -g -c $< -o $@
 
 obj:
 	@mkdir $(OBJ_DIR)

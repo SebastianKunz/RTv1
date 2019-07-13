@@ -1,5 +1,17 @@
 #include "rgba.h"
 
+t_rgba	init_rgba(unsigned char r, unsigned char g,
+					unsigned char b, unsigned char a)
+{
+	t_rgba color;
+
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	color.a = a;
+	return color;
+}
+
 t_rgba	uint_to_rgba(unsigned int color)
 {
 	t_rgba result;

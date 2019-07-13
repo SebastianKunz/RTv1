@@ -7,9 +7,12 @@
 #include <stdio.h>
 
 int	test_new_vector3(void);
+int	test_init_vector3(void);
 int test_sub_vector3(void);
 int test_add_vector3(void);
 int	test_scale_vector3(void);
 int test_dot_vector3(void);
+int	test_magnitude_vector3(void);
+int	test_normalize_vector3(void);
 
 #endif

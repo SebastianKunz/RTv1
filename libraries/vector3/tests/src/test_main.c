@@ -22,17 +22,23 @@ void check(int success)
 
 void print_results()
 {
-	printf("%d/%d passed\n", was_successful, total_tested);
+	printf("%d/%d \33[0;32mpassed\n", was_successful, total_tested);
+
+	if (was_successful == total_tested)
+		printf("\33[0;32mALL TESTS PASSED\n");
 }
 
 int main()
 {
 
 	check(test_new_vector3());
+	check(test_init_vector3());
 	check(test_sub_vector3());
 	check(test_add_vector3());
 	check(test_scale_vector3());
 	check(test_dot_vector3());
+	check(test_magnitude_vector3());
+	check(test_normalize_vector3());
 
 	print_results();
 	return 0;
