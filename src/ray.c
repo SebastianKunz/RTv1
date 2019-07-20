@@ -3,37 +3,23 @@
 #include "ray.h"
 #include "sphere.h"
 
-t_ray	init_ray(t_vector3 origin, t_vector3 direction)
+t_ray	init_ray(t_vector3 origin, t_vector3 direction, float length)
 {
 	t_ray	ray;
-	ray.origin = origin;
-	ray.direction = origin;
 
+	ray.origin = origin;
+	ray.direction = direction;
+	ray.length = length;
 	return ray;
 }
 
-t_rgba	trace_ray(t_ray ray, t_sphere sphere, unsigned int depth)
+t_vector3	calculate_point_on_screen(t_screen screen, float u, float v)
 {
-	double min_t = FLT_MAX;
-	int 	min_i = -1;
-	float	t = FLT_MAX;
+	t_vector3 width_v = scale_vector3(sub_vector3(screen.top_right, screen.top_left), u);
+	t_vector3 first = add_vector3(screen.top_left, width_v);
+	t_vector3 height_v = scale_vector3(sub_vector3(screen.bottom_left, screen.top_left), v);
 
-	if (sphere_intersect(sphere, ray, &t)) {
-		if (min_t < t)
-			min_t = t;
-
-		return sphere_shading(ray, sphere);
-	}
-
-	return init_rgba(0, 0, 0, 0);
-}
-
-t_rgba	trace(t_rt rt, int x, int y)
-{
-	t_vector3	origin = init_vector3(0, 0, 0);
-	t_vector3	direction = normalize_vector3(init_vector3(x, y, 150));
-
-	return trace_ray(init_ray(origin, direction), rt.sphere, 10);
+	return add_vector3(first, height_v);
 }
 
 void do_raytracing(t_rt *rt)
@@ -42,7 +28,15 @@ void do_raytracing(t_rt *rt)
 	{
 		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
-			rt->pixels[y * SCREEN_HEIGHT + x] = trace(*rt, x, y);
+			float u = (float)x / SCREEN_WIDTH;
+			float v = (float)y / SCREEN_HEIGHT;
+
+			t_vector3 point_on_screen = calculate_point_on_screen(rt->screen, u, v);
+			t_vector3 ray_dir = sub_vector3(point_on_screen, rt->camera.pos);
+			t_ray ray = init_ray(rt->camera.pos, normalize_vector3(ray_dir), 10000000.0f);
+
+			if (sphere_intersect(rt->sphere, &ray))
+				rt->pixels[y * SCREEN_HEIGHT + x] = rt->sphere.color;
 		}
 	}
 }
