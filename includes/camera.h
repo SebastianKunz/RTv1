@@ -3,7 +3,7 @@
 
 #include "rtv1_types.h"
 
-void	update_camera(t_rt *rt, t_vector3 new_pos, t_vector3 new_dir);
+void	move_camera(t_camera *camera, t_vector3 move_by, t_vector3 rotate_by);
 void	init_camera(t_rt *rt);
 
 #endif

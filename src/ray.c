@@ -36,7 +36,17 @@ void do_raytracing(t_rt *rt)
 			t_ray ray = init_ray(rt->camera.pos, normalize_vector3(ray_dir), 10000000.0f);
 
 			if (sphere_intersect(rt->sphere, &ray))
-				rt->pixels[y * SCREEN_HEIGHT + x] = rt->sphere.color;
+			{
+				t_vector3 hitpoint = add_vector3(ray.origin, scale_vector3(ray.direction, ray.length));
+				t_vector3 normal = normalize_vector3(sub_vector3(hitpoint, rt->sphere.center));
+				t_vector3 light_ray_direction = normalize_vector3(sub_vector3(rt->light.pos, hitpoint));
+				float d = dot_vector3(normal, light_ray_direction);
+
+				if (d < 0.0f) d = 0.0f;
+
+				rt->pixels[y * SCREEN_HEIGHT + x] = mult_rgba(rt->sphere.color, d);
+
+			}
 		}
 	}
 }

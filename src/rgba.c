@@ -23,3 +23,8 @@ t_rgba	uint_to_rgba(unsigned int color)
 
 	return result;
 }
+
+t_rgba	mult_rgba(t_rgba rgba, float scalar)
+{
+	return init_rgba(rgba.r * scalar, rgba.g * scalar, rgba.b * scalar, rgba.a * scalar);
+}

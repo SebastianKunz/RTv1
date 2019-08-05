@@ -32,6 +32,8 @@ void	render_window(t_rt *rt)
 
 void	update_window(t_rt *rt)
 {
+	// clear pixels
+	memset(rt->pixels, 0, sizeof(t_rgba) * SCREEN_HEIGHT * SCREEN_WIDTH);
 	do_raytracing(rt);
 	render_window(rt);
 }
@@ -68,16 +70,23 @@ int get_events(SDL_Event *event, t_rt *rt)
 					return 1;
 					break;
 				case SDLK_w:
-					; // this is required, because of smth
-					t_camera cam = cam = rt->camera;
-					t_vector3 new_pos = add_vector3(cam.pos, init_vector3(0, 0, 1));
-					update_camera(rt, new_pos, cam.view_dir);
+					move_camera(&rt->camera, init_vector3(0, 0, -1), init_vector3(0, 0, 0));
 					update_window(rt);
-					return 0;
+					break ;
 				case SDLK_s:
-					rt->camera.pos.z -= 1.0f;
+					move_camera(&rt->camera, init_vector3(0, 0, 1), init_vector3(0, 0, 0));
 					update_window(rt);
-					return 0;
+					break ;
+				case SDLK_a:
+					;
+					move_camera(&rt->camera, init_vector3(0.1, 0, 0), init_vector3(0, 0, 0));
+					update_window(rt);
+					break ;
+				case SDLK_d:
+					;
+					move_camera(&rt->camera, init_vector3(-0.1, 0, 0), init_vector3(0, 0, 0));
+					update_window(rt);
+					break ;
 			}
 			break;
 		case SDL_QUIT:
@@ -97,7 +106,7 @@ void	init_scene(t_rt *rt)
 	rt->sphere.color = init_rgba(255, 0, 0, 255);
 
 	rt->light.intensity = init_rgba(255, 255, 255, 255);
-	rt->light.pos = init_vector3(100, 100, 100);
+	rt->light.pos = init_vector3(100, 0, -100);
 
 	rt->pixels = malloc(sizeof(t_rgba) * SCREEN_HEIGHT * SCREEN_WIDTH);
 	memset(rt->pixels, 0, sizeof(t_rgba) * SCREEN_HEIGHT * SCREEN_WIDTH);
