@@ -39,6 +39,7 @@ int main()
 	check(test_dot_vector3());
 	check(test_magnitude_vector3());
 	check(test_normalize_vector3());
+	check(test_normalize_vector3_ref());
 
 	print_results();
 	return 0;

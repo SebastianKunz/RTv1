@@ -26,7 +26,7 @@ TEST_INC = -I $(TEST_DIR)includes
 
 TEST_SRC = test_main.c test_new_vector3.c test_sub_vector3.c test_add_vector3.c \
 			test_scale_vector3.c test_dot_vector3.c test_magnitude_vector3.c \
-			test_init_vector3.c test_normalize_vector3.c
+			test_init_vector3.c test_normalize_vector3.c test_normalize_vector3_ref.c
 
 TEST_OBJ = $(addprefix $(OBJ_DIR), $(TEST_SRC:.c=.o))
 

@@ -14,5 +14,6 @@ int	test_scale_vector3(void);
 int test_dot_vector3(void);
 int	test_magnitude_vector3(void);
 int	test_normalize_vector3(void);
+int	test_normalize_vector3_ref(void);
 
 #endif
