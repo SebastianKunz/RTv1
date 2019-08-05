@@ -1,7 +1,8 @@
 INC = -I ./includes/
 
 V_SRC = new_vector3.c add_vector3.c sub_vector3.c scale_vector3.c dot_vector3.c \
-		magnitude_vector3.c init_vector3.c normalize_vector3.c print_vector3.c
+		magnitude_vector3.c init_vector3.c normalize_vector3.c print_vector3.c  \
+		normalize_vector3_ref.c
 
 V_DIR = ./src/
 
